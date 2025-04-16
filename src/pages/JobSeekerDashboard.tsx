@@ -14,7 +14,7 @@ interface Application {
 
 function JobSeekerDashboard() {
   const isDarkMode = useStore((state) => state.isDarkMode);
-  const currentUser = useStore((state) => state.currentUser) as User;
+  const currentUser = useStore((state) => state.currentUser) as User | undefined;
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,6 +22,11 @@ function JobSeekerDashboard() {
   useEffect(() => {
     const fetchApplications = async () => {
       setLoading(true);
+      setError(null);
+      if (!currentUser || currentUser.role !== 'jobseeker') {
+        setLoading(false);
+        return;
+      }
       try {
         const token = localStorage.getItem('token');
         console.log('Fetching applications with token:', token);
@@ -29,41 +34,41 @@ function JobSeekerDashboard() {
         console.log('API Response:', response.data);
         const safeApplications = response.data.map((app: any) => ({
           ...app,
-          job: app.job || null,
+          job: app.job || { _id: '', title: 'N/A', company: 'N/A' },
         }));
         setApplications(safeApplications);
       } catch (err) {
         const errorMsg = handleError(err);
+        console.log('Fetch error:', errorMsg, err);
         setError(errorMsg);
       } finally {
         setLoading(false);
       }
     };
-    if (currentUser?.role === 'jobseeker') fetchApplications();
+    fetchApplications();
   }, [currentUser]);
 
   const handleWithdraw = async (id: string) => {
+    if (!currentUser) return;
     try {
       const token = localStorage.getItem('token');
-      const url = `/applications/${id}`;
-      console.log('Withdrawing application with id:', id, 'token:', token, 'full URL:', `${api.defaults.baseURL}${url}`, 'user ID:', currentUser.id);
-      const response = await api.delete(url, {
+      console.log('Withdrawing application with id:', id, 'token:', token, 'full URL:', `${api.defaults.baseURL}/applications/${id}`);
+      const response = await api.delete(`/applications/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setApplications(applications.filter(app => app._id !== id));
       window.alert('Job withdrawn successfully');
     } catch (err) {
       const errorMsg = handleError(err);
+      console.error('Withdraw error details:', err, 'Response:', (err as AxiosError)?.response?.data, 'Status:', (err as AxiosError)?.response?.status);
       setError(errorMsg);
-      console.error('Withdraw error details:', err, 'Response:', (err as any).response?.data, 'Status:', (err as any).response?.status);
     }
   };
 
   const handleError = (err: unknown): string => {
     if (err instanceof AxiosError) {
-      return err.response?.data?.error || 'Failed to perform action';
+      return err.response?.data?.error || `API Error: ${err.message}`;
     }
-    console.error('Unexpected error:', err);
     return 'An unexpected error occurred';
   };
 
@@ -77,27 +82,22 @@ function JobSeekerDashboard() {
     const weeks = Array.from({ length: 6 }, (_, i) => {
       const weekStart = new Date(now);
       weekStart.setDate(now.getDate() - (5 - i) * 7);
-      return weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) +
-             ' - ' +
-             new Date(weekStart.setDate(weekStart.getDate() + 6)).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      return `${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${new Date(weekStart.setDate(weekStart.getDate() + 6)).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
     });
 
-    const activity = weeks.map(week => ({
+    return weeks.map(week => ({
       week,
       applications: applications.filter(app => {
         const appliedDate = new Date(app.appliedAt);
-        const [startMonth, startDay] = week.split(' - ')[0].split(' ');
-        const [endMonth, endDay] = week.split(' - ')[1].split(' ');
-        const start = new Date(now.getFullYear(), months.indexOf(startMonth), parseInt(startDay));
-        const end = new Date(now.getFullYear(), months.indexOf(endMonth), parseInt(endDay));
-        return appliedDate >= start && appliedDate <= end;
+        const [start, end] = week.split(' - ');
+        const [startMonth, startDay] = start.split(' ');
+        const [endMonth, endDay] = end.split(' ');
+        const startDate = new Date(now.getFullYear(), ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].indexOf(startMonth), parseInt(startDay));
+        const endDate = new Date(now.getFullYear(), ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].indexOf(endMonth), parseInt(endDay));
+        return appliedDate >= startDate && appliedDate <= endDate;
       }).length,
     }));
-
-    return activity;
   };
-
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   if (loading) return <div className="text-center py-8">Loading...</div>;
   if (error) return <div className="text-center py-8 text-red-500">{error}</div>;
@@ -119,21 +119,15 @@ function JobSeekerDashboard() {
         </div>
         <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200`}>
           <h3 className="text-lg font-semibold mb-2">Under Review</h3>
-          <p className="text-3xl font-bold text-yellow-600">
-            {applications.filter(app => app.status === 'pending').length}
-          </p>
+          <p className="text-3xl font-bold text-yellow-600">{applications.filter(app => app.status === 'pending').length}</p>
         </div>
         <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200`}>
           <h3 className="text-lg font-semibold mb-2">Accepted</h3>
-          <p className="text-3xl font-bold text-green-600">
-            {applications.filter(app => app.status === 'accepted').length}
-          </p>
+          <p className="text-3xl font-bold text-green-600">{applications.filter(app => app.status === 'accepted').length}</p>
         </div>
         <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200`}>
           <h3 className="text-lg font-semibold mb-2">Rejected</h3>
-          <p className="text-3xl font-bold text-red-600">
-            {applications.filter(app => app.status === 'rejected').length}
-          </p>
+          <p className="text-3xl font-bold text-red-600">{applications.filter(app => app.status === 'rejected').length}</p>
         </div>
       </div>
 

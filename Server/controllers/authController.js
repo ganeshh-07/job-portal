@@ -11,12 +11,12 @@ exports.register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({ name, email, password: hashedPassword, role: role || 'jobseeker' });
     await user.save();
-    res.status(201).json({ message: 'User registered successfully' });
+    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.status(201).json({ token, user: { id: user._id, name, email, role: user.role } });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 exports.login = async (req, res) => {
   try {
