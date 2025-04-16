@@ -8,7 +8,7 @@ This project is a **fully functional Job Portal** developed using the **MERN (Mo
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React.js, Tailwind CSS / Bootstrap (if used)
+- **Frontend**: React.js, Tailwind CSS / Bootstrap 
 - **Backend**: Node.js, Express.js
 - **Database**: MongoDB
 - **Authentication**: JWT-based Auth
