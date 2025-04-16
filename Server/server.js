@@ -8,8 +8,7 @@ const port = process.env.PORT || 5000;
 
 // Middleware
 app.use(express.json());
-// Use a single cors configuration with the correct origin
-app.use(cors({ origin: 'https://your-current-vercel-url.vercel.app' })); // Replace with your actual Vercel URL
+app.use(cors());
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 5000 })
