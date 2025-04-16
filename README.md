@@ -2,47 +2,53 @@
 
 ## 📌 Overview
 
-This project serves as a **starter template** for building a **fully functional Job Portal** using the **MERN (MongoDB, Express.js, React, Node.js) stack**.
-
-Candidates are expected to implement **both frontend and backend features** to deliver a **complete** job portal web application.
+This project is a **fully functional Job Portal** developed using the **MERN (MongoDB, Express.js, React, Node.js) stack**. It enables both **Employers** and **Job Seekers** to interact through a modern web platform with role-based access and dynamic features.
 
 ---
 
-## 🎯 Assessment Tasks
+## 🛠️ Tech Stack
+
+- **Frontend**: React.js, Tailwind CSS / Bootstrap (if used)
+- **Backend**: Node.js, Express.js
+- **Database**: MongoDB
+- **Authentication**: JWT-based Auth
+- **Deployment**: Vercel (Frontend) & Render (Backend)
+
+---
+
+## ✨ Features & Implementation
 
 ### 1️⃣ User Authentication System
 
-- Implement user authentication using **JWT** or **session-based authentication**.
-- Support **Role-Based Access Control (RBAC)** for **Employers** and **Job Seekers**.
+- 🔐 JWT-based login & registration
+- 👥 Role-Based Access Control (RBAC) with separate routes for **Employers** and **Job Seekers**
 
 ### 2️⃣ Job Listings & Search
 
-- Develop **API endpoints** to **Create, Read, Update, and Delete (CRUD)** job listings.
-- Implement a **search and filtering system** for job listings.
+- 📄 Full CRUD API for job postings
+- 🔍 Job listing search and filtering by title, location, job type, etc.
 
 ### 3️⃣ Job Application System
 
-- Allow **Job Seekers** to apply for jobs.
-- Enable **Employers** to **view applicants** for their job listings.
+- ✅ Job Seekers can apply for jobs
+- 🧾 Employers can view applicants for each job
 
-### 4️⃣ Employer & Job Seeker Dashboards
+### 4️⃣ Dashboards
 
-- **Employers Dashboard**: Manage **job postings** and **view applicants**.
-- **Job Seekers Dashboard**: Track **applied jobs** and manage applications.
+- 🧑‍💼 **Employer Dashboard**
+  - Post new jobs
+  - Manage existing job listings
+  - View applicants per job
+- 👨‍💻 **Job Seeker Dashboard**
+  - View and track applied jobs
+  - Manage personal applications
 
-### 5️⃣ Extend Functionality & Design
+### 5️⃣ UI Enhancements & Extra Features
 
-- Feel free to add **new features**, **improvements**, or **design enhancements** to showcase your skills.
-
----
-
-## 📌 Submission Guidelines
-
-1. **Push your code** to a **GitHub repository**.
-2. Provide a **README.md** with:
-   - **Setup Instructions**
-   - **Features & Implementation Details**
-3. **Deploy the application** on any hosting platform (**Vercel, Render, etc.**).
-4. **Submit the live link** along with the **repository link**.
+- 🚀 Responsive design for mobile & desktop
+- 📨 Toast notifications
+- 🧠 Clean code structure and reusable components
+- 🧹 Input validations and loading states
 
 ---
+
