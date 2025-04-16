@@ -1,5 +1,5 @@
 import React, { useState, useEffect, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom'; // Updated to include Link
 import { useStore } from '../store';
 import { login } from '../services/api';
 import { AxiosError } from 'axios';
@@ -100,7 +100,7 @@ function Login() {
           </button>
         </form>
         <p className="text-center text-sm text-gray-600">
-          <a href="/register" className="font-medium text-blue-600 hover:text-blue-800">New user? Register here</a>
+          <Link to="/register" className="font-medium text-blue-600 hover:text-blue-800">New user? Register here</Link> {/* Updated to Link */}
         </p>
       </div>
     </div>
