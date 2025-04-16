@@ -13,7 +13,7 @@ interface LoginResponse {
 }
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: 'https://job-portal-i76b.onrender.com/api', // Updated URL
 });
 
 api.interceptors.request.use(
