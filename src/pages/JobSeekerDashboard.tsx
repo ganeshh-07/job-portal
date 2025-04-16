@@ -24,16 +24,17 @@ function JobSeekerDashboard() {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        console.log('Fetching applications with token:', token);
+        console.log('Fetching applications with token:', token, 'Full URL:', `${api.defaults.baseURL}/applications/applications`);
         const response = await getApplications();
-        console.log('API Response:', response.data);
+        console.log('API Response:', response.status, response.data);
         const safeApplications = response.data.map((app: any) => ({
           ...app,
-          job: app.job || null,
+          job: app.job || { _id: '', title: 'Title Unavailable', company: 'Company Unavailable' },
         }));
         setApplications(safeApplications);
       } catch (err) {
         const errorMsg = handleError(err);
+        console.error('Fetch error details:', err, 'Response:', (err as AxiosError)?.response?.data, 'Status:', (err as AxiosError)?.response?.status);
         setError(errorMsg);
       } finally {
         setLoading(false);
@@ -45,11 +46,12 @@ function JobSeekerDashboard() {
   const handleWithdraw = async (id: string) => {
     try {
       const token = localStorage.getItem('token');
-      const url = `/applications/${id}`;
+      const url = `/applications/applications/${id}`; // Updated to match backend route
       console.log('Withdrawing application with id:', id, 'token:', token, 'full URL:', `${api.defaults.baseURL}${url}`, 'user ID:', currentUser.id);
       const response = await api.delete(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      console.log('Withdraw response:', response.status, response.data);
       setApplications(applications.filter(app => app._id !== id));
       window.alert('Job withdrawn successfully');
     } catch (err) {
@@ -88,8 +90,8 @@ function JobSeekerDashboard() {
         const appliedDate = new Date(app.appliedAt);
         const [startMonth, startDay] = week.split(' - ')[0].split(' ');
         const [endMonth, endDay] = week.split(' - ')[1].split(' ');
-        const start = new Date(now.getFullYear(), months.indexOf(startMonth), parseInt(startDay));
-        const end = new Date(now.getFullYear(), months.indexOf(endMonth), parseInt(endDay));
+        const start = new Date(now.getFullYear(), ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].indexOf(startMonth), parseInt(startDay));
+        const end = new Date(now.getFullYear(), ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].indexOf(endMonth), parseInt(endDay));
         return appliedDate >= start && appliedDate <= end;
       }).length,
     }));

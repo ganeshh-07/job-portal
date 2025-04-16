@@ -39,8 +39,10 @@ exports.applyForJob = async (req, res) => {
 
 exports.getApplications = async (req, res) => {
   try {
-    console.log('Fetching applications for user:', req.user?.id);
-    const applications = await Application.find({ applicant: req.user?.id }).populate('job applicant');
+    console.log('Fetching applications for user:', req.user?.id, 'Full URL:', req.protocol + '://' + req.get('host') + req.originalUrl);
+    const applications = await Application.find({ applicant: req.user?.id }).populate('job applicant', 'title company name email');
+    console.log('Applications query result:', applications.map(app => ({ _id: app._id, job: app.job?._id, status: app.status })));
+    if (!applications.length) console.log('No applications found for user:', req.user?.id);
     res.json(applications);
   } catch (error) {
     console.error('Get applications error:', error);
@@ -89,7 +91,6 @@ exports.updateApplicationStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    // Validate status
     if (!['pending', 'accepted', 'rejected'].includes(status)) {
       return res.status(400).json({ error: 'Invalid status value. Must be "pending", "accepted", or "rejected"' });
     }
@@ -99,7 +100,6 @@ exports.updateApplicationStatus = async (req, res) => {
       return res.status(404).json({ error: 'Application not found' });
     }
 
-    // Check if the user is the employer who posted the job
     const job = await Job.findById(application.job);
     if (!job || job.postedBy.toString() !== req.user?.id) {
       return res.status(403).json({ error: 'Access denied' });
