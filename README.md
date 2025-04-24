@@ -43,7 +43,7 @@ This project is a **fully functional Job Portal** developed using the **MERN (Mo
   - View and track applied jobs
   - Manage personal applications
 
-### 5️⃣ UI Enhancements & Extra Features
+### 5️⃣ UI Enhancements & Extra Features 
 
 - 🚀 Responsive design for mobile & desktop
 - 📨 Toast notifications
