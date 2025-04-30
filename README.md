@@ -1,6 +1,6 @@
 # 🚀 Job Portal - MERN Stack  ( Live Demo: https://job-portal-coral-tau.vercel.app/ )
 
-## 📌 Overview
+## 📌 Overview 
 
 This project is a **fully functional Job Portal** developed using the **MERN (MongoDB, Express.js, React, Node.js) stack**. It enables both **Employers** and **Job Seekers** to interact through a modern web platform with role-based access and dynamic features.
 
